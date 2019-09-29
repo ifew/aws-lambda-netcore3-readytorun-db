@@ -1,0 +1,14 @@
+﻿{
+  "Information" : [    
+    "Try AWS Lambda .NET Core 3.0"
+  ],
+
+  "profile":"default",
+  "region" : "ap-southeast-1",
+  "configuration" : "Release",
+  "framework" : "provided",
+  "function-runtime":"provided",
+  "function-memory-size" : 128,
+  "function-timeout" : 30,
+  "function-handler" : "aws-lambda-netcore3-readytorun::aws_lambda_netcore3_readytorun.Function::FunctionHandler"
+  }
