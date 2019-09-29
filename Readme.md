@@ -1,0 +1,1 @@
+# Example AWS Lambda C# .NET Core 3.0 Release though Custom Runtime (Amazon.Lambda.RuntimeSupport) and ReadyToRun with connect MySQL via not using any ORM
