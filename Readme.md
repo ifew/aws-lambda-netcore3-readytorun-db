@@ -1,3 +1,18 @@
-# Example AWS Lambda C# .NET Core 3.0 Release though Custom Runtime (Amazon.Lambda.RuntimeSupport) and ReadyToRun with connect MySQL via not using any ORM
+# Example AWS Lambda C# .NET Core 3.0 Release and ReadyToRun with connect MySQL via not using any ORM
 
-docker run --rm -v "$PWD":/var/task lambci/lambda:dotnetcore2.1 aws-lambda-netcore3-readytorun::aws_lambda_netcore3_readytorun.Function::FunctionHandler ''
+## 1. Build file and packing to output/package.zip
+
+```bash
+sh build_linux.sh
+```
+
+## 2. Upload to aws s3
+
+```bash
+aws s3 cp package.zip s3://backend-layer [--profile AWS-PROFILE-NAME]
+```
+
+
+## Note
+
+Can't test via lambda docker on localhot
