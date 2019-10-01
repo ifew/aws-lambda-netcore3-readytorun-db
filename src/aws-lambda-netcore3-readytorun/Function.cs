@@ -1,12 +1,10 @@
-using System.Runtime.CompilerServices;
 using System.Linq;
 using Amazon.Lambda.Core;
+using Amazon.Lambda.RuntimeSupport;
 using Amazon.Lambda.Serialization.Json;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Threading.Tasks;
 
@@ -18,7 +16,7 @@ namespace aws_lambda_netcore3_readytorun
     {
         private static async Task Main(string[] args)
         {
-            Func<ILambdaContext, Task<List<Member>>> func = FunctionHandler;
+            Func<ILambdaContext, List<Member>> func = FunctionHandler;
 			using(var handlerWrapper = HandlerWrapper.GetHandlerWrapper(func, new JsonSerializer()))
 			{
 				using(var lambdaBootstrap = new LambdaBootstrap(handlerWrapper))
