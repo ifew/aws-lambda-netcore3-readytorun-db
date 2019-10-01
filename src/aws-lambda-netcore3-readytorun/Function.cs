@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using System.Linq;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.Json;
 using MySql.Data.MySqlClient;
@@ -8,17 +10,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Threading.Tasks;
 
+[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+
 namespace aws_lambda_netcore3_readytorun
 {
     public class Function
     {
-        public static ILambdaContext context;
-        public ILambdaSerializer Serializer => new Amazon.Lambda.Serialization.Json.JsonSerializer();
-
-        public static void Main(string[] args)
-		{
-            Console.WriteLine(FunctionHandler(context));
-		}
+        private static async Task Main(string[] args)
+        {
+            Func<ILambdaContext, Task<List<Member>>> func = FunctionHandler;
+			using(var handlerWrapper = HandlerWrapper.GetHandlerWrapper(func, new JsonSerializer()))
+			{
+				using(var lambdaBootstrap = new LambdaBootstrap(handlerWrapper))
+				{
+					await lambdaBootstrap.RunAsync();
+				}
+			}
+        }
         
         public static List<Member> FunctionHandler(ILambdaContext context)
         {
@@ -61,20 +69,5 @@ namespace aws_lambda_netcore3_readytorun
             }
         }
         
-    }
-
-    [Table("test_member")]
-    public class Member
-    {
-        [Key]
-        [Column("id")]
-        public int Id { get; set; }
-
-        [Column("firstname")]
-        public string Firstname { get; set; }
-
-        [Column("lastname")]
-        public string Lastname { get; set; }
-
     }
 }
