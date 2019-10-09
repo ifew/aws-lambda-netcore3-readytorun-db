@@ -1,32 +1,20 @@
 using System.Linq;
 using Amazon.Lambda.Core;
-using Amazon.Lambda.RuntimeSupport;
 using Amazon.Lambda.Serialization.Json;
 using MySql.Data.MySqlClient;
+using LambdaNative;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
-
 namespace aws_lambda_netcore3_readytorun
 {
-    public class Function
+    public class Handler : IHandler<string, List<Member>>
     {
-        private static async Task Main(string[] args)
-        {
-            Func<ILambdaContext, List<Member>> func = FunctionHandler;
-			using(var handlerWrapper = HandlerWrapper.GetHandlerWrapper(func, new JsonSerializer()))
-			{
-				using(var lambdaBootstrap = new LambdaBootstrap(handlerWrapper))
-				{
-					await lambdaBootstrap.RunAsync();
-				}
-			}
-        }
-        
-        public static List<Member> FunctionHandler(ILambdaContext context)
+        public ILambdaSerializer Serializer => new JsonSerializer();
+
+        public List<Member> Handle(string request, ILambdaContext context)
         {
             Console.WriteLine("Log: Start Connection");
 
