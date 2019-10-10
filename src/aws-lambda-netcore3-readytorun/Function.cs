@@ -8,6 +8,7 @@ using LambdaNative;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Dynamic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -48,15 +49,17 @@ namespace aws_lambda_netcore3_readytorun
                     using (var reader = cmd.ExecuteReader())
                     {
                         Console.WriteLine("Log: reader.FieldCount: " + reader.FieldCount);
-                        List<Member> members = new List<Member>();
+
+                        List<dynamic> members = new List<dynamic>();
+
                         while (reader.Read())
                         {
-                            members.Add(new Member()
-                            {
-                                Id = Convert.ToInt32(reader["id"]),
-                                Firstname = reader["firstname"].ToString(),
-                                Lastname = reader["lastname"].ToString() + lang + unit_id,
-                            });
+                            var expandoObject = new ExpandoObject() as IDictionary<string, object>;
+
+                            for (var i = 0; i < reader.FieldCount; i++) //for col
+                                expandoObject.Add(reader.GetName(i), reader[i]);
+
+                            members.Add(expandoObject);
                         }
 
                         Console.WriteLine("Log: Count: " + members.Count);
