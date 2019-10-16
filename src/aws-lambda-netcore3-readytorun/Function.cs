@@ -1,15 +1,12 @@
-using System.Linq;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.Json;
 using Amazon.Lambda.APIGatewayEvents;
-using System.Net;
 using MySql.Data.MySqlClient;
 using LambdaNative;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace aws_lambda_netcore3_readytorun
@@ -65,7 +62,7 @@ namespace aws_lambda_netcore3_readytorun
                         Console.WriteLine("Log: Count: " + members.Count);
 
                         APIGatewayProxyResponse respond = new APIGatewayProxyResponse {
-                            StatusCode = (int)HttpStatusCode.OK,
+                            StatusCode = 200,
                             Headers = new Dictionary<string, string>
                             {
                                 { "Content-Type", "application/json" },
