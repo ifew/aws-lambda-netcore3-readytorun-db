@@ -7,7 +7,7 @@ namespace LambdaNative
     {
         public static void Main()
         {
-            LambdaNative.Run<Handler, APIGatewayProxyRequest, APIGatewayProxyResponse>();
+            LambdaNative.RunAsync<Handler, APIGatewayProxyRequest, APIGatewayProxyResponse>();
         }
     }
 }

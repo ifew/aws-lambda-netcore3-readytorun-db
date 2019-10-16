@@ -1,3 +1,4 @@
+using System.Security.AccessControl;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.APIGatewayEvents;
 using MySql.Data.MySqlClient;
@@ -6,14 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace aws_lambda_netcore3_readytorun
 {
-    public class Handler : IHandler<APIGatewayProxyRequest, APIGatewayProxyResponse>
+    public class Handler : IAsyncHandler<APIGatewayProxyRequest, APIGatewayProxyResponse>
     {
         public ILambdaSerializer Serializer => new Amazon.Lambda.Serialization.Json.JsonSerializer();
 
-        public APIGatewayProxyResponse Handle(APIGatewayProxyRequest request, ILambdaContext context)
+        public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest request, ILambdaContext context)
         {
             string unit_id = null;
             string lang = "THA";
@@ -25,28 +27,28 @@ namespace aws_lambda_netcore3_readytorun
                 lang = request.QueryStringParameters["lang"];
             }
 
-            Console.WriteLine("Log: Start Connection");
+            context.Logger.LogLine("Log: Start Connection");
 
             string configDB = Environment.GetEnvironmentVariable("DB_CONNECTION");
 
             using (var _connection = new MySqlConnection(configDB))
             {
-                Console.WriteLine("Log: _connection.ConnectionString: " + _connection.ConnectionString);
+                context.Logger.LogLine("Log: _connection.ConnectionString: " + _connection.ConnectionString);
 
-                _connection.Open();
+                await _connection.OpenAsync();
 
-                Console.WriteLine("Log: State: " + _connection.State.ToString());
-                Console.WriteLine("Log: DB ServerVersion: " + _connection.ServerVersion);
+                context.Logger.LogLine("Log: State: " + _connection.State.ToString());
+                context.Logger.LogLine("Log: DB ServerVersion: " + _connection.ServerVersion);
 
                 using (var cmd = new MySqlCommand("SELECT * FROM test_member", _connection))
                 {
-                    using (var reader = cmd.ExecuteReader())
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        Console.WriteLine("Log: reader.FieldCount: " + reader.FieldCount);
+                        context.Logger.LogLine("Log: reader.FieldCount: " + reader.FieldCount);
 
                         List<Member> members = new List<Member>();
 
-                        while (reader.Read())
+                        while (await reader.ReadAsync())
                         {
                             members.Add(new Member()
                             {
@@ -56,7 +58,7 @@ namespace aws_lambda_netcore3_readytorun
                             });
                         }
 
-                        Console.WriteLine("Log: Count: " + members.Count);
+                        context.Logger.LogLine("Log: Count: " + members.Count);
 
                         APIGatewayProxyResponse respond = new APIGatewayProxyResponse {
                             StatusCode = 200,
