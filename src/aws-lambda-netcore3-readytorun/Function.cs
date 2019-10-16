@@ -5,7 +5,7 @@ using LambdaNative;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace aws_lambda_netcore3_readytorun
 {
@@ -65,7 +65,7 @@ namespace aws_lambda_netcore3_readytorun
                                 { "Content-Type", "application/json" },
                                 { "Access-Control-Allow-Origin", "*" }
                             },
-                            Body = System.Text.Json.JsonSerializer.Serialize<List<dynamic>>(members)
+                            Body = JsonConvert.SerializeObject(members)
                         };
 
                         return respond;
