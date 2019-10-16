@@ -5,7 +5,7 @@ using LambdaNative;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace aws_lambda_netcore3_readytorun
 {
@@ -44,16 +44,16 @@ namespace aws_lambda_netcore3_readytorun
                     {
                         Console.WriteLine("Log: reader.FieldCount: " + reader.FieldCount);
 
-                        List<dynamic> members = new List<dynamic>();
+                        List<Member> members = new List<Member>();
 
                         while (reader.Read())
                         {
-                            var expandoObject = new ExpandoObject() as IDictionary<string, object>;
-
-                            for (var i = 0; i < reader.FieldCount; i++) //for col
-                                expandoObject.Add(reader.GetName(i), reader[i]);
-
-                            members.Add(expandoObject);
+                            members.Add(new Member()
+                            {
+                                Id = Convert.ToInt32(reader["id"]),
+                                Firstname = reader["firstname"].ToString(),
+                                Lastname = reader["lastname"].ToString(),
+                            });
                         }
 
                         Console.WriteLine("Log: Count: " + members.Count);
@@ -63,9 +63,11 @@ namespace aws_lambda_netcore3_readytorun
                             Headers = new Dictionary<string, string>
                             {
                                 { "Content-Type", "application/json" },
-                                { "Access-Control-Allow-Origin", "*" }
+                                { "Access-Control-Allow-Origin", "*" },
+                                { "X-Debug-lang", lang },
+                                { "X-Debug-unit-id", unit_id }
                             },
-                            Body = JsonConvert.SerializeObject(members)
+                            Body = System.Text.Json.JsonSerializer.Serialize<List<Member>>(members)
                         };
 
                         return respond;
