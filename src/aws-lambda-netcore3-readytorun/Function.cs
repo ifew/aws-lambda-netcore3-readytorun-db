@@ -1,4 +1,3 @@
-using System.Security.AccessControl;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.APIGatewayEvents;
 using MySql.Data.MySqlClient;
@@ -7,15 +6,14 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace aws_lambda_netcore3_readytorun
 {
-    public class Handler : IAsyncHandler<APIGatewayProxyRequest, APIGatewayProxyResponse>
+    public class Handler : IHandler<APIGatewayProxyRequest, APIGatewayProxyResponse>
     {
         public ILambdaSerializer Serializer => new Amazon.Lambda.Serialization.Json.JsonSerializer();
 
-        public async Task<APIGatewayProxyResponse> Handle(APIGatewayProxyRequest request, ILambdaContext context)
+        public APIGatewayProxyResponse Handle(APIGatewayProxyRequest request, ILambdaContext context)
         {
             string unit_id = null;
             string lang = "THA";
@@ -35,20 +33,20 @@ namespace aws_lambda_netcore3_readytorun
             {
                 context.Logger.LogLine("Log: _connection.ConnectionString: " + _connection.ConnectionString);
 
-                await _connection.OpenAsync();
+                _connection.Open();
 
                 context.Logger.LogLine("Log: State: " + _connection.State.ToString());
                 context.Logger.LogLine("Log: DB ServerVersion: " + _connection.ServerVersion);
 
                 using (var cmd = new MySqlCommand("SELECT * FROM test_member", _connection))
                 {
-                    using (var reader = await cmd.ExecuteReaderAsync())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         context.Logger.LogLine("Log: reader.FieldCount: " + reader.FieldCount);
 
                         List<Member> members = new List<Member>();
 
-                        while (await reader.ReadAsync())
+                        while (reader.Read())
                         {
                             members.Add(new Member()
                             {
