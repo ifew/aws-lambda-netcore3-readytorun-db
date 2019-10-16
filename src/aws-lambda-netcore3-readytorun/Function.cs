@@ -1,13 +1,11 @@
 using Amazon.Lambda.Core;
-using Amazon.Lambda.Serialization.Json;
 using Amazon.Lambda.APIGatewayEvents;
 using MySql.Data.MySqlClient;
 using LambdaNative;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Dynamic;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace aws_lambda_netcore3_readytorun
 {
@@ -35,8 +33,7 @@ namespace aws_lambda_netcore3_readytorun
             {
                 Console.WriteLine("Log: _connection.ConnectionString: " + _connection.ConnectionString);
 
-                if (_connection.State == ConnectionState.Closed)
-                    _connection.Open();
+                _connection.Open();
 
                 Console.WriteLine("Log: State: " + _connection.State.ToString());
                 Console.WriteLine("Log: DB ServerVersion: " + _connection.ServerVersion);
@@ -68,7 +65,7 @@ namespace aws_lambda_netcore3_readytorun
                                 { "Content-Type", "application/json" },
                                 { "Access-Control-Allow-Origin", "*" }
                             },
-                            Body = JsonConvert.SerializeObject(members)
+                            Body = System.Text.Json.JsonSerializer.Serialize<List<dynamic>>(members)
                         };
 
                         return respond;
